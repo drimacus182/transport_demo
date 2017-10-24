@@ -1,11 +1,29 @@
 const regl = require('regl')();
-const d3 = require('d3-geo');
+const d3 = require('d3');
 
 
+d3.csv("http://192.168.1.56:9966/first.csv", function(err, csv_data) {
+    if (err) throw err;
 
-var projection = d3.geoMercator()
-    .center([30.554495, 50.439845])
-    .fitExtent([500, 500], geojson);
+    var geojson = csv_data.map(function (d) {
+        return {
+            type: "Feature",
+            properties: d,
+            geometry: {
+                type: "Point",
+                coordinates: [+d.LONGITUDE, +d.LATITUDE]
+            }
+        };
+    });
+
+    var projection = d3.geoMercator()
+        .center([30.554495, 50.439845])
+        .fitExtent([500, 500], geojson);
+
+    geojson.forEach(function(d){return d.pr = projection(d.geometry.coordinates)});
+    debugger;
+    console.log(geojson);
+});
 
 
 
@@ -145,7 +163,7 @@ const drawDots = regl({
     },
     primitive: 'points'
 
-})
+});
 
 var points = createData(POINT_COUNT);
 
